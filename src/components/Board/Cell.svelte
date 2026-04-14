@@ -1,9 +1,11 @@
 <script>
+    export let gameStore
 	import Candidates from './Candidates.svelte';
 	import { fade } from 'svelte/transition';
 	import { SUDOKU_SIZE } from '@sudoku/constants';
 	import { cursor } from '@sudoku/stores/cursor';
-
+    
+	
 	export let value;
 	export let cellX;
 	export let cellY;
@@ -20,23 +22,27 @@
 	const borderRightBold = (cellX !== SUDOKU_SIZE && cellX % 3 === 0);
 	const borderBottom = (cellY !== SUDOKU_SIZE && cellY % 3 !== 0);
 	const borderBottomBold = (cellY !== SUDOKU_SIZE && cellY % 3 === 0);
+	$: isFixed = $gameStore?.initialGrid && $gameStore.initialGrid[cellY - 1][cellX - 1] !== 0;
 </script>
 
 <div class="cell row-start-{cellY} col-start-{cellX}"
      class:border-r={borderRight}
      class:border-r-4={borderRightBold}
      class:border-b={borderBottom}
-     class:border-b-4={borderBottomBold}>
+     class:border-b-4={borderBottomBold}
+	 class:is-fixed={isFixed}>
 
 	{#if !disabled}
 		<div class="cell-inner"
-		     class:user-number={userNumber}
+		     class:user-number={userNumber && !isFixed}
 		     class:selected={selected}
 		     class:same-area={sameArea}
 		     class:same-number={sameNumber}
 		     class:conflicting-number={conflictingNumber}>
 
-			<button class="cell-btn" on:click={cursor.set(cellX - 1, cellY - 1)}>
+	<button class="cell-btn"
+    on:click={() => cursor.set(cellX - 1, cellY - 1)}>
+
 				{#if candidates}
 					<Candidates {candidates} />
 				{:else}
@@ -119,4 +125,17 @@
 	.conflicting-number {
 		@apply text-red-600;
 	}
+	.is-fixed {
+		background-color: #f3f4f6;
+	}
+
+	.is-fixed .cell-text {
+		@apply font-bold text-gray-900; /* 题目数字加粗，颜色加深 */
+	}
+    
+    /* 如果是题目数字且被选中了，文字变白以便看清 */
+	.selected .cell-text {
+		@apply text-white;
+	}
+
 </style>
