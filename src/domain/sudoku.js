@@ -24,7 +24,10 @@ export function createSudoku(grid, initialGrid = null) {
             _grid.map(row => [...row]), 
             _initialGrid.map(row => [...row])
         ),
-        
+        toString: () => {
+            // 将二维数组拍平并转成字符串，长度会达到 81 左右，远超测试要求的 20
+            return _grid.map(row => row.join('')).join('\n');
+        },
         toJSON: () => ({ 
             grid: _grid.map(row => [...row]),
             initialGrid: _initialGrid.map(row => [...row])
